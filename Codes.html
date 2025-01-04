@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anantavaram Port Efficiency Study - Sorting & Graph Algorithms</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        h2 {
+            font-size: 24px;
+            margin-top: 40px;
+        }
+        p {
+            font-size: 18px;
+        }
+        pre {
+            background-color: #f7f7f7;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Anantavaram Port Efficiency Study</h1>
+    <h2>Sorting Algorithms</h2>
+    <p>Efficient scheduling of vessel arrivals and departures is crucial to minimize waiting times and berth occupancy rates. Priority Queues (Heaps) and Greedy Algorithms are used to manage these tasks.</p>
+    <pre><code>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <time.h>
+    
+    #define MAX 100
+    
+    int compare(const void* a, const void* b) {
+        Vessel* A = (Vessel*)a;
+        Vessel* B = (Vessel*)b;
+        return A->arrival_time - B->arrival_time;
+    }
+    
+    int main() {
+        int n;
+        printf("Enter the number of vessels: ");
+        scanf("%d", &n);
+        
+        Vessel* vessels = (Vessel*)calloc(n, sizeof(Vessel));
+        
+        for (int i = 0; i < n; i++) {
+            printf("Enter details for vessel %d:
+", i + 1);
+            printf("Vessel ID: ");
+            scanf("%s", vessels[i].vessel_id);
+            printf("Priority: ");
+            scanf("%d", &vessels[i].priority);
+            printf("Arrival Time: ");
+            scanf("%d", &vessels[i].arrival_time);
+            printf("Berth Time: ");
+            scanf("%d", &vessels[i].berth_time);
+        }
+        
+        qsort(vessels, n, sizeof(Vessel), compare);
+        
+        int current_time = 0;
+        printf("Vessel Schedule:
+");
+        for (int i = 0; i < n; i++) {
+            if (current_time < vessels[i].arrival_time) {
+                current_time = vessels[i].arrival_time;
+            }
+            printf("Vessel ID: %s, Arrival Time: %d, Start Berth Time: %d, End Berth Time: %d
+",
+                   vessels[i].vessel_id, vessels[i].arrival_time, current_time,
+                   current_time + vessels[i].berth_time);
+            current_time += vessels[i].berth_time;
+        }
+        
+        free(vessels);
+        return 0;
+    }
+    </code></pre>
+    
+    <h2>Graph Algorithms for Logistics Optimization</h2>
+    <p>Graph algorithms are applied to optimize the port's transportation network. Shortest path algorithms like Dijkstra’s and Minimum Spanning Tree algorithms like Kruskal’s or Prim’s are used for network optimization.</p>
+    
+    <pre><code>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <limits.h>
+    
+    #define MAX 100
+    
+    int min_cost[MAX], parent[MAX], n;
+    int cost[MAX][MAX];
+    
+    int min_span_tree(int v) {
+        int min_cost_edge = INT_MAX;
+        int u = -1;
+        
+        for (int i = 0; i < n; i++) {
+            if (min_cost[i] && cost[parent[i]][i] < min_cost_edge) {
+                min_cost_edge = cost[parent[i]][i];
+                u = i;
+            }
+        }
+        
+        if (u == -1) {
+            return 0;
+        }
+        
+        int res = min_cost[u] + min_span_tree(u);
+        min_cost[u] = cost[parent[u]][u];
+        for (int i = 0; i < n; i++) {
+            if (find(parent[i]) != find(parent[u]) && cost[u][i] && cost[u][i] < cost[parent[i]][i]) {
+                parent[i] = u;
+            }
+        }
+        return res;
+    }
+    
+    int find(int x) {
+        if (parent[x] == x) return x;
+        return find(parent[x]);
+    }
+    
+    void unite(int x, int y) {
+        int root_x = find(x);
+        int root_y = find(y);
+        
+        if (root_x != root_y) {
+            parent[root_x] = root_y;
+        }
+    }
+    
+    void kruskal(int V) {
+        for (int i = 0; i < V; i++) {
+            parent[i] = i;
+        }
+        
+        for (int i = 0; i < V - 1; i++) {
+            for (int j = 0; j < V; j++) {
+                for (int k = 0; k < V; k++) {
+                    if (cost[j][k] && find(j) != find(k) && cost[j][k] < min_cost[i]) {
+                        min_cost[i] = cost[j][k];
+                        unite(j, k);
+                    }
+                }
+            }
+        }
+        
+        int total_cost = min_span_tree(0);
+        printf("Total Cost of Minimum Spanning Tree: %d\n", total_cost);
+    }
+    
+    int main() {
+        int V, E;
+        scanf("%d %d", &V, &E);
+        
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                cost[i][j] = INT_MAX;
+            }
+            parent[i] = i;
+        }
+        
+        for (int i = 0; i < E; i++) {
+            int u, v, w;
+            scanf("%d %d %d", &u, &v, &w);
+            cost[u][v] = w;
+            cost[v][u] = w;
+        }
+        
+        kruskal(V);
+        
+        return 0;
+    }
+    </code></pre>
+    
+    <h2>Hash Tables for Efficient Data Storage & Retrieval</h2>
+    <p>Hash tables are used to efficiently store and retrieve data, which is essential for handling large datasets in port operations.</p>
+    
+    <pre><code>
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdlib.h>
+    #include <time.h>
+    
+    #define TABLE_SIZE 1000
+    
+    unsigned int hash(const char* key) {
+        unsigned int hash_value = 0;
+        int i;
+        for (i = 0; *key != '\0'; ++key, ++i) {
+            hash_value = (hash_value + *key) % TABLE_SIZE;
+        }
+        return hash_value;
+    }
+    
+    struct HashNode {
+        char* key;
+        char* value;
+        struct HashNode* next;
+    };
+    
+    struct HashTable {
+        int size;
+        struct HashNode** table;
+    };
+    
+    HashTable* createHashTable(int size) {
+        HashTable* ht = (HashTable*)calloc(1, sizeof(HashTable));
+        ht->size = size;
+        ht->table = (HashNode**)calloc(ht->size, sizeof(HashNode*));
+        for (int i = 0; i < ht->size; i++) {
+            ht->table[i] = NULL;
+        }
+        return ht;
+    }
+    
+    void insert(HashTable* ht, char* key, char* value) {
+        unsigned int index = hash(key);
+        HashNode* newNode = (HashNode*)calloc(1, sizeof(HashNode));
+        newNode->key = key;
+        newNode->value = value;
+        newNode->next = ht->table[index];
+        ht->table[index] = newNode;
+    }
+    
+    char* search(HashTable* ht, char* key) {
+        unsigned int index = hash(key);
+        HashNode* temp = ht->table[index];
+        while (temp != NULL) {
+            if (strcmp(temp->key, key) == 0) {
+                return temp->value;
+            }
+            temp = temp->next;
+        }
+        return NULL;
+    }
+    
+    void delete(HashTable* ht, char* key) {
+        unsigned int index = hash(key);
+        HashNode* temp = ht->table[index];
+        HashNode* prev = NULL;
+        
+        while (temp != NULL) {
+            if (strcmp(temp->key, key) == 0) {
+                if (prev) {
+                    prev->next = temp->next;
+                } else {
+                    ht->table[index] = temp->next;
+                }
+                free(temp->key);
+                free(temp->value);
+                free(temp);
+                break;
+            }
+            prev = temp;
+            temp = temp->next;
+        }
+    }
+    
+    void display(HashTable* ht) {
+        for (int i = 0; i < ht->size; i++) {
+            printf("Index %d: ", i);
+            HashNode* temp = ht->table[i];
+            while (temp) {
+                printf("Key: %s, Value: %s -> ", temp->key, temp->value);
+                temp = temp->next;
+            }
+            printf("NULL\n");
+        }
+    }
+    
+    void freeHashTable(HashTable* ht) {
+        for (int i = 0; i < ht->size; i++) {
+            HashNode* temp = ht->table[i];
+            while (temp) {
+                HashNode* next_node = temp->next;
+                free(temp->key);
+                free(temp->value);
+                free(temp);
+                temp = next_node;
+            }
+        }
+        free(ht->table);
+        free(ht);
+    }
+    
+    int main() {
+        HashTable* ht = createHashTable(TABLE_SIZE);
+        
+        insert(ht, "port", "Anantavaram Port");
+        insert(ht, "city", "Anantavaram");
+        insert(ht, "country", "India");
+        
+        char* result = search(ht, "port");
+        if (result) {
+            printf("Port Name: %s\n", result);
+        } else {
+            printf("Port not found.\n");
+        }
+        
+        result = search(ht, "country");
+        if (result) {
+            printf("Country: %s\n", result);
+        } else {
+            printf("Country not found.\n");
+        }
+        
+        delete(ht, "city");
+        result = search(ht, "city");
+        if (result) {
+            printf("City Name: %s\n", result);
+        } else {
+            printf("City not found.\n");
+        }
+        
+        display(ht);
+        
+        freeHashTable(ht);
+        
+        return 0;
+    }
+    </code></pre>
+    
+    <h2>Tree Structures for Hierarchical Data</h2>
+    <p>Tree structures are used to represent hierarchical data such as organizational charts or task dependencies.</p>
+    
+    <pre><code>
+    #include <stdio.h>
+    #include <stdlib.h>
+    
+    #define MAX_NODES 100
+    
+    struct TreeNode {
+        char name[50];
+        int children;
+        struct TreeNode* child[MAX_NODES];
+    };
+    
+    int main() {
+        struct TreeNode root = {
+            .name = "Port",
+            .children = 2,
+            .child = {
+                {
+                    .name = "Operations",
+                    .children = 2,
+                    .child = {
+                        {.name = "Loading", .children = 0},
+                        {.name = "Unloading", .children = 0}
+                },
+                {
+                    .name = "Logistics",
+                    .children = 2,
+                    .child = {
+                        {.name = "Storage", .children = 0},
+                        {.name = "Transport", .children = 0}
+                }
+            }
+        };
+        
+        printf("Hierarchical Tree Structure:
+");
+        printf("Port
+            Operations
+                Loading
+                Unloading
+            Logistics
+                Storage
+                Transport
+");
+        
+        return 0;
+    }
+    </code></pre>
+</body>
+</html>
